@@ -76,13 +76,13 @@ public class BeanFactory {
                 // 如果依赖的类型是接口，则查询其实现类,
                 // class1.isAssignableFrom(class2) = true 代表class2是class1类型，可分配class2对象给class
                 for (Class<?> key : BeanFactory.beans.keySet()) {
-                    if (fieldType.isAssignableFrom(key)) {
+                    if (fieldType.isAssignableFrom(key)) {//TODO? 这里是否需要判断多个，并且需要检查是否是可以初始化的类
                         fieldType = key;
                         break;
                     }
                 }
             }
-            field.set(bean, BeanFactory.getBean(fieldType));
+            field.set(bean, BeanFactory.getBean(fieldType));//TODO? 这里如果Bean还没有被初始化，怎么办？
         }
         // todo 这里可能AutoWired注入失败，例如存在循环依赖，或者bean工厂中根本不存在，目前暂时先不处理
         beans.put(aClass, bean);
@@ -106,7 +106,7 @@ public class BeanFactory {
             String pointcutName = null;
 
             // 初始化对象，简单起见，这里先假定每一个代理类，
-            // 并且最多只有一个切点，一个前置以及一个后置处理器，所以我们也必需先处理 pointcut，再解析before和after方法
+            // 并且最多只有{一个}切点，一个前置以及一个后置处理器，所以我们也必需先处理 pointcut，再解析before和after方法
             Object bean = aClass.newInstance();
             for (Method m : bean.getClass().getDeclaredMethods()) {
                 if (m.isAnnotationPresent(Pointcut.class)) {
